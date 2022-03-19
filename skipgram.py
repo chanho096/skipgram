@@ -32,6 +32,16 @@ class SkipGramEmbeddings(nn.Module):
         else:
             context_emb = self.context_embeddings(word)
 
+        z = torch.bmm(
+            word_emb.unsqueeze(1),
+            context_emb.unsqueeze(-1)
+        ).squeeze()
+
+        return torch.sigmoid(z)
+
+    def embedding(self, word):
+        return self.word_embeddings(word)
+
     def get_coords(self):
         embs = [self.tag2emb, self.track2emb]
         weights = [emb.weight.detach().cpu() for emb in embs]
