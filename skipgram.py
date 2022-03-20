@@ -122,7 +122,7 @@ def sample_train_dataset(train_dataset):
     # negative samples must not appear in each row
     neg_rows = rows.repeat(window_size)
     is_appeared_in_row = train_dataset[neg_rows, neg_contexts]
-    is_appeared_in_row = np.array(is_appeared_in_row).reshape(-1, )
+    is_appeared_in_row = np.array(is_appeared_in_row, dtype=bool).reshape(-1, )
 
     neg_words = neg_words[~is_appeared_in_row]
     neg_contexts = neg_contexts[~is_appeared_in_row]
