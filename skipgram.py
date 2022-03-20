@@ -9,6 +9,8 @@ import numba as nb
 class SkipGramEmbeddings(nn.Module):
     def __init__(self, n_item, n_dim, pre_trained=None):
         super(SkipGramEmbeddings, self).__init__()
+        self.n_item = n_item
+        self.n_dim = n_dim
 
         if pre_trained is None:
             self.word_embeddings = nn.Embedding(
@@ -28,9 +30,9 @@ class SkipGramEmbeddings(nn.Module):
         word_emb = self.word_embeddings(word)
 
         if share:
-            context_emb = self.word_embeddings(word)
+            context_emb = self.word_embeddings(context)
         else:
-            context_emb = self.context_embeddings(word)
+            context_emb = self.context_embeddings(context)
 
         z = torch.bmm(
             word_emb.unsqueeze(1),
@@ -42,6 +44,9 @@ class SkipGramEmbeddings(nn.Module):
     def embedding(self, word):
         return self.word_embeddings(word)
 
+    def embeddings(self):
+        return self.word_embeddings.weight
+
     def get_coords(self):
         embs = [self.tag2emb, self.track2emb]
         weights = [emb.weight.detach().cpu() for emb in embs]
@@ -50,7 +55,9 @@ class SkipGramEmbeddings(nn.Module):
 
     def _init_weight(self):
         self.word_embeddings.weight.data.uniform_(-0.5, 0.5)
+        self.word_embeddings.weight.data /= self.n_dim
         self.context_embeddings.weight.data.uniform_(-0.5, 0.5)
+        self.context_embeddings.weight.data /= self.n_dim
 
 
 @nb.njit(cache=True)
@@ -79,7 +86,7 @@ def sample_train_dataset(train_dataset):
 
         train_dataset: (num_sentences, num_items)
     """
-    window_size = 5  # self.params["window_size"]
+    window_size = 5
 
     # dataset
     train_dataset = train_dataset
