@@ -35,7 +35,7 @@ class SkipGramEmbeddings(nn.Module):
         z = torch.bmm(
             word_emb.unsqueeze(1),
             context_emb.unsqueeze(-1)
-        ).squeeze()
+        ).squeeze(-1).squeeze(-1)
 
         return torch.sigmoid(z)
 
