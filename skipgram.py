@@ -48,7 +48,7 @@ class SkipGramEmbeddings(nn.Module):
         return self.word_embeddings.weight
 
     def get_coords(self):
-        embs = [self.tag2emb, self.track2emb]
+        embs = [self.word_embeddings, self.context_embeddings]
         weights = [emb.weight.detach().cpu() for emb in embs]
 
         return tuple(weights)
